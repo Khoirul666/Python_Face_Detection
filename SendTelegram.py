@@ -6,8 +6,8 @@ import numpy as np
 import asyncio
 
 # Token bot Telegram
-TELEGRAM_BOT_TOKEN = '7492865767:AAEFY6PbVOfYprwleADVQW0FL38EHhCYFLQ'
-CHAT_ID = '2135671506'
+TELEGRAM_BOT_TOKEN = 'xx'
+CHAT_ID = 'xx'
 
 # Inisialisasi bot Telegram
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
@@ -18,6 +18,10 @@ video_source = 'D:\\KHOI\\PYTHON\\Source\\pengendara motor\\video\\selected\\vid
 # Membuka video atau gambar
 cap = cv2.VideoCapture(video_source)
 cap.set(cv2.CAP_PROP_BUFFERSIZE, 3)
+
+# Tentukan ukuran frame output yang diinginkan
+output_width = 1280
+output_height = 760
 
 # Model YOLO
 model = YOLO("D:\\KHOI\\PYTHON\\Coba Python\\Test Detection\\Best.pt")
@@ -41,6 +45,7 @@ else:
             continue
         
         results = model(frame)
+        cropped_images = []
         
         # Dapatkan hasil deteksi
         for result in results:
@@ -58,13 +63,21 @@ else:
 
                 # Crop gambar sesuai bounding box
                 cropped_image = frame[y1:y2, x1:x2]
-                cv2.imshow("gambar crop",cropped_image)
+                cropped_images.append(cropped_image)
 
                 # Mengirim gambar hasil crop ke Telegram
                 asyncio.run(kirim_gambar(cropped_image))
 
+        # Ubah ukuran frame
+        resized_frame = cv2.resize(frame, (output_width, output_height))
+
         # Tampilkan frame dengan bounding box dan label
-        cv2.imshow('Gambar Asli', frame)
+        cv2.imshow('Kamera CCTV', resized_frame)
+
+        # Tampilkan semua gambar hasil crop
+        for i, cropped_image in enumerate(cropped_images):
+            window_name = f'Cropped Image {i}'
+            cv2.imshow(window_name, cropped_image)
 
         # Tekan 'q' untuk keluar dari loop
         if cv2.waitKey(10000) & 0xFF == ord('q'):

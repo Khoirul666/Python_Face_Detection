@@ -1,8 +1,8 @@
 import requests
 
 # Token bot Telegram
-TELEGRAM_BOT_TOKEN = '7492865767:AAEFY6PbVOfYprwleADVQW0FL38EHhCYFLQ'
-CHAT_ID = '2135671506'
+TELEGRAM_BOT_TOKEN = ''
+CHAT_ID = ''
 
 # Pesan yang ingin dikirim
 MESSAGE = 'Test Pesan'

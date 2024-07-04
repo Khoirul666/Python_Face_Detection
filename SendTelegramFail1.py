@@ -4,8 +4,8 @@ from io import BytesIO
 from telegram import Bot
 
 # Telegram bot token and chat ID
-TELEGRAM_BOT_TOKEN = '7492865767:AAEFY6PbVOfYprwleADVQW0FL38EHhCYFLQ'
-CHAT_ID = '2135671506'
+TELEGRAM_BOT_TOKEN = ''
+CHAT_ID = ''
 
 # Initialize Telegram bot
 bot = Bot(token=TELEGRAM_BOT_TOKEN)

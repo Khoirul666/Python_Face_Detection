@@ -5,8 +5,8 @@ from telegram import Bot
 import numpy as np
 
 # Token bot Telegram
-TELEGRAM_BOT_TOKEN = '7492865767:AAEFY6PbVOfYprwleADVQW0FL38EHhCYFLQ'
-CHAT_ID = '2135671506'
+TELEGRAM_BOT_TOKEN = 'xx'
+CHAT_ID = 'xx'
 
 # Inisialisasi bot Telegram
 bot = Bot(token=TELEGRAM_BOT_TOKEN)

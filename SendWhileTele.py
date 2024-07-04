@@ -2,8 +2,8 @@ import asyncio
 from telegram import Bot
 
 # Ganti 'YOUR_TOKEN_HERE' dengan token yang kamu dapat dari BotFather
-TOKEN = '7492865767:AAEFY6PbVOfYprwleADVQW0FL38EHhCYFLQ'
-CHAT_ID = '2135671506'
+TOKEN = ''
+CHAT_ID = ''
 
 async def send_recurring_message(bot):
     while True:

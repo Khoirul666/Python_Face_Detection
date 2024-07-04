@@ -2,8 +2,8 @@ import asyncio
 from telegram import Bot
 
 # Ganti 'YOUR_TOKEN_HERE' dengan token yang kamu dapat dari BotFather
-TOKEN = '7492865767:AAEFY6PbVOfYprwleADVQW0FL38EHhCYFLQ'
-CHAT_ID = '2135671506'
+TOKEN = 'xx'
+CHAT_ID = 'xx'
 IMAGE_PATH = 'D:\\KHOI\\PYTHON\\Source\\pengendara motor\\video\\selected\\video100186.jpg'  # Ganti dengan path ke gambar yang ingin kamu kirim
 
 async def send_recurring_image(bot):
