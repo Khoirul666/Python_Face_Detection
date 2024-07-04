@@ -6,8 +6,8 @@ import numpy as np
 import asyncio
 
 # Token bot Telegram
-TELEGRAM_BOT_TOKEN = 'xx'
-CHAT_ID = 'xx'
+TELEGRAM_BOT_TOKEN = ''
+CHAT_ID = ''
 
 # Inisialisasi bot Telegram
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
@@ -45,6 +45,7 @@ else:
             continue
         
         results = model(frame)
+        label_cropped = []
         cropped_images = []
         
         # Dapatkan hasil deteksi
@@ -61,8 +62,9 @@ else:
                 # Tambahkan label pada bounding box
                 cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 0, 255), 2)
 
-                # Crop gambar sesuai bounding box
+                # Crop gambar sesuai bounding box dan masukkan ke dalam array jika label=tidak memakai helm
                 cropped_image = frame[y1:y2, x1:x2]
+                label_cropped.append(label)
                 cropped_images.append(cropped_image)
 
                 # Mengirim gambar hasil crop ke Telegram
@@ -76,7 +78,7 @@ else:
 
         # Tampilkan semua gambar hasil crop
         for i, cropped_image in enumerate(cropped_images):
-            window_name = f'Cropped Image {i}'
+            window_name = f'Cropped Image {i}{label_cropped[i]}'
             cv2.imshow(window_name, cropped_image)
 
         # Tekan 'q' untuk keluar dari loop
