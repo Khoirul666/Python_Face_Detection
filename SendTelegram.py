@@ -2,21 +2,22 @@ import cv2
 from ultralytics import YOLO
 from io import BytesIO
 from telegram import Bot
-import numpy as np
 import asyncio
+import pytesseract
 
 # Token bot Telegram
-TELEGRAM_BOT_TOKEN = '7129268947:AAEa4LgRoM5vLrT9UAgwfj08WQMgj4UOQCw'
+TELEGRAM_BOT_TOKEN = '7492865767:AAEFY6PbVOfYprwleADVQW0FL38EHhCYFLQ'
 CHAT_ID = '2135671506'
 
 # Inisialisasi bot Telegram
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
 
 # Path video file atau URL stream
-video_source = 'D:\\KHOI\\PYTHON\\dataset\\HELM and NO\\PICTURE\\NO HELM\\no_helm 001.jpg'
+no_helm = 'D:\\KHOI\\PYTHON\\dataset\\HELM and NO\\PICTURE\\NO HELM\\no_helm 002.jpg'
+helm = 'D:\\KHOI\\PYTHON\\dataset\\HELM and NO\\PICTURE\\HELM\\helm 025.jpg'
 
 # Membuka video atau gambar
-cap = cv2.VideoCapture(video_source)
+cap = cv2.VideoCapture(no_helm)
 cap.set(cv2.CAP_PROP_BUFFERSIZE, 3)
 
 # Tentukan ukuran frame output yang diinginkan
@@ -24,67 +25,94 @@ output_width = 1280
 output_height = 760
 
 # Model YOLO
-model = YOLO("D:\\KHOI\\PYTHON\\Coba Python\\Test Detection\\Best.pt")
+model = YOLO(r"D:\KHOI\PYTHON\runs\detect\train4\weights\best.pt")
 
-async def kirim_gambar(cropped_image):
-    pass
+async def kirim_gambar(cropped_image,nama_file):
+    # while True:
+    #     with open(cropped_image,'rb') as image:
+    #         await bot.send_photo(chat_id=CHAT_ID, photo=image)
+    # pass
+    image_bytes = cv2.imencode('.jpg',cropped_image)[1].tobytes()
+    bio = BytesIO(image_bytes)
+    bio.name = "Gambar Potongan.jpg"
+    bio.seek(0)
 
-if not cap.isOpened():
-    print("Error: Tidak dapat membuka video.")
-else:
-    frame_number = 0  # Untuk penamaan gambar hasil crop
-    while True:
-        ret, frame = cap.read()
+    # ambil data plat nomor
+    skala = 3.0
+    c_h = int(cropped_image.shape[0] * skala)
+    c_w = int(cropped_image.shape[1] * skala)
+    pytesseract.pytesseract.tesseract_cmd = r'C:/Program Files/Tesseract-OCR/tesseract.exe'
+    ri = cv2.resize(cropped_image,(c_w,c_h),interpolation=cv2.INTER_AREA)
+    img_gray = cv2.cvtColor(ri,cv2.COLOR_BGR2GRAY)
+    th,threshold = cv2.threshold(img_gray,150,255,cv2.THRESH_BINARY_INV)
+    cv2.imshow(nama_file,threshold)
+    result = pytesseract.image_to_string((threshold))
 
-        if not ret:
-            print("Error: Tidak dapat membaca frame dari stream.")
-            break
+    result = ''.join([char for char in result if char.isalnum()])
+    
+    await bot.send_photo(chat_id=CHAT_ID, photo=bio, caption=result)
 
-        if frame is None or frame.size == 0:
-            print("Error: Frame kosong.")
-            continue
-        
-        results = model(frame)
-        label_cropped = []
-        cropped_images = []
-        
-        # Dapatkan hasil deteksi
-        for result in results:
-            for box in result.boxes:
-                x1, y1, x2, y2 = map(int, box.xyxy[0])
-                conf = box.conf[0]
-                cls = int(box.cls[0])
-                label = f'{model.names[cls]} {conf:.2f}'
-                
-                # Gambarkan kotak bounding box pada frame
-                cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 255), 3)
-                
-                # Tambahkan label pada bounding box
-                cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 0, 255), 2)
 
-                # Crop gambar sesuai bounding box dan masukkan ke dalam array jika label=tidak memakai helm
-                cropped_image = frame[y1:y2, x1:x2]
-                label_cropped.append(label)
-                cropped_images.append(cropped_image)
+async def main():
+    if not cap.isOpened():
+        print("Error: Tidak dapat membuka video.")
+    else:
+        while True:
+            ret, frame = cap.read()
 
-                # Mengirim gambar hasil crop ke Telegram
-                asyncio.run(kirim_gambar(cropped_image))
+            if not ret:
+                print("Error: Tidak dapat membaca frame dari stream.")
+                break
 
-        # Ubah ukuran frame
-        resized_frame = cv2.resize(frame, (output_width, output_height))
+            if frame is None or frame.size == 0:
+                print("Error: Frame kosong.")
+                continue
+            
+            results = model(frame)
+            label_cropped = []
+            cropped_images = []
+            
+            # Dapatkan hasil deteksi
+            for result in results:
+                for box in result.boxes:
+                    x1, y1, x2, y2 = map(int, box.xyxy[0])
+                    conf = box.conf[0]
+                    cls = int(box.cls[0])
+                    label = f'{model.names[cls]} {conf:.2f}'
+                    label1 = f'{model.names[cls]}'
+                    
+                    # Gambarkan kotak bounding box pada frame
+                    cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 255), 3)
+                    
+                    # Tambahkan label pada bounding box
+                    cv2.putText(frame, label1, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 0, 255), 2)
 
-        # Tampilkan frame dengan bounding box dan label
-        cv2.imshow('Kamera CCTV', resized_frame)
+                    # Crop gambar sesuai bounding box dan masukkan ke dalam array jika label=tidak memakai helm
+                    cropped_image = frame[y1:y2, x1:x2]
+                    label_cropped.append(label1)
+                    cropped_images.append(cropped_image)
 
-        # Tampilkan semua gambar hasil crop
-        for i, cropped_image in enumerate(cropped_images):
-            window_name = f'Cropped Image {i}{label_cropped[i]}'
-            cv2.imshow(window_name, cropped_image)
+                    # Mengirim gambar hasil crop ke Telegram
+                    print(label1)
+                    await kirim_gambar(cropped_image,label1)
 
-        # Tekan 'q' untuk keluar dari loop
-        if cv2.waitKey(10000) & 0xFF == ord('q'):
-            break
+            # Ubah ukuran frame
+            resized_frame = cv2.resize(frame, (output_width, output_height))
 
-    # Release semua resource yang digunakan
-    cap.release()
-    cv2.destroyAllWindows()
+            # Tampilkan frame dengan bounding box dan label
+            cv2.imshow('Kamera CCTV', resized_frame)
+
+            # Tampilkan semua gambar hasil crop
+            for i, cropped_image in enumerate(cropped_images):
+                window_name = f'{label_cropped[i]}'
+                # cv2.imshow(window_name, cropped_image)
+
+            # Tekan 'q' untuk keluar dari loop
+            if cv2.waitKey(50000) & 0xFF == ord('q'):
+                break
+
+        # Release semua resource yang digunakan
+        cap.release()
+        cv2.destroyAllWindows()
+
+asyncio.run(main())
