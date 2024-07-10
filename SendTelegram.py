@@ -50,7 +50,7 @@ async def kirim_gambar(cropped_image,nama_file):
 
     result = ''.join([char for char in result if char.isalnum()])
     
-    await bot.send_photo(chat_id=CHAT_ID, photo=bio, caption=result)
+    # await bot.send_photo(chat_id=CHAT_ID, photo=bio, caption=result)
 
 
 async def main():
