@@ -8,8 +8,8 @@ import pytesseract
 from PIL import Image
 
 # Token bot Telegram
-TELEGRAM_BOT_TOKEN = '7492865767:AAFCDkfozmyFzFkTSAZAEO5NC6hLrVrFP4E'
-CHAT_ID = '2135671506'
+TELEGRAM_BOT_TOKEN = 'xx'
+CHAT_ID = 'xx'
 
 # Inisialisasi bot Telegram
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
