@@ -62,8 +62,6 @@ async def kirim_gambar(cropped_image,nama_file):
             else:
                 raise
 
-
-
 async def main():
     if not cap.isOpened():
         print("Error: Tidak dapat membuka video.")
