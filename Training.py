@@ -1,6 +1,6 @@
 from ultralytics import YOLO
 
-# Muat model pralatih YOLOv5
+# Muat model pralatih YOLOv8
 model = YOLO('yolov8s.pt')  # atau model pralatih lainnya
 
 # Latih model menggunakan dataset Anda

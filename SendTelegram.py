@@ -2,12 +2,14 @@ import cv2
 from ultralytics import YOLO
 from io import BytesIO
 from telegram import Bot
+from telegram.error import TimedOut
 import asyncio
 import pytesseract
+from PIL import Image
 
 # Token bot Telegram
-TELEGRAM_BOT_TOKEN = 'xx'
-CHAT_ID = 'xx'
+TELEGRAM_BOT_TOKEN = '7492865767:AAFCDkfozmyFzFkTSAZAEO5NC6hLrVrFP4E'
+CHAT_ID = '2135671506'
 
 # Inisialisasi bot Telegram
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
@@ -17,7 +19,7 @@ no_helm = 'D:\\KHOI\\PYTHON\\dataset\\HELM and NO\\PICTURE\\NO HELM\\no_helm 002
 helm = 'D:\\KHOI\\PYTHON\\dataset\\HELM and NO\\PICTURE\\HELM\\helm 025.jpg'
 
 # Membuka video atau gambar
-cap = cv2.VideoCapture(no_helm)
+cap = cv2.VideoCapture("https://s3.ap-southeast-1.amazonaws.com/moladin.assets/blog/wp-content/uploads/2019/08/15175153/15-Cara-Menjadi-Pengendara-Motor-yang-Baik-di-Jalan-Raya-3.jpg")
 cap.set(cv2.CAP_PROP_BUFFERSIZE, 3)
 
 # Tentukan ukuran frame output yang diinginkan
@@ -25,7 +27,7 @@ output_width = 1280
 output_height = 760
 
 # Model YOLO
-model = YOLO(r"D:\KHOI\PYTHON\runs\detect\train4\weights\best.pt")
+model = YOLO(r"D:\KHOI\PYTHON\dataset\Detection Helm and Number.v5i.yolov8\best.pt")
 
 async def kirim_gambar(cropped_image,nama_file):
     # while True:
@@ -45,12 +47,21 @@ async def kirim_gambar(cropped_image,nama_file):
     ri = cv2.resize(cropped_image,(c_w,c_h),interpolation=cv2.INTER_AREA)
     img_gray = cv2.cvtColor(ri,cv2.COLOR_BGR2GRAY)
     th,threshold = cv2.threshold(img_gray,150,255,cv2.THRESH_BINARY_INV)
-    cv2.imshow(nama_file,threshold)
+    # cv2.imshow(nama_file,threshold)
     result = pytesseract.image_to_string((threshold))
 
     result = ''.join([char for char in result if char.isalnum()])
-    
-    # await bot.send_photo(chat_id=CHAT_ID, photo=bio, caption=result)
+    count = 3
+    for attempt in range(count):
+        try:
+            await bot.send_photo(chat_id=CHAT_ID, photo=bio, caption=result)
+            break
+        except TimedOut:
+            if attempt<count-1:
+                await asyncio.sleep(2)
+            else:
+                raise
+
 
 
 async def main():
@@ -87,7 +98,7 @@ async def main():
                     # Tambahkan label pada bounding box
                     cv2.putText(frame, label1, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 0, 255), 2)
 
-                    # Crop gambar sesuai bounding box dan masukkan ke dalam array jika label=tidak memakai helm
+                    # Crop gambar sesuai bounding box dan masukkan ke dalam array
                     cropped_image = frame[y1:y2, x1:x2]
                     label_cropped.append(label1)
                     cropped_images.append(cropped_image)
