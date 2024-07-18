@@ -16,10 +16,12 @@ bot = Bot(token=TELEGRAM_BOT_TOKEN)
 
 # Path video file atau URL stream
 no_helm = 'D:\\KHOI\\PYTHON\\dataset\\HELM and NO\\PICTURE\\NO HELM\\no_helm 002.jpg'
-helm = 'D:\\KHOI\\PYTHON\\dataset\\HELM and NO\\PICTURE\\HELM\\helm 025.jpg'
+helm = 'D:\\KHOI\\PYTHON\\dataset\\HELM and NO\\PICTURE\\HELM\\helm 001.jpg'
 
 # Membuka video atau gambar
-cap = cv2.VideoCapture("https://s3.ap-southeast-1.amazonaws.com/moladin.assets/blog/wp-content/uploads/2019/08/15175153/15-Cara-Menjadi-Pengendara-Motor-yang-Baik-di-Jalan-Raya-3.jpg")
+# cap = cv2.VideoCapture("https://s3.ap-southeast-1.amazonaws.com/moladin.assets/blog/wp-content/uploads/2019/08/15175153/15-Cara-Menjadi-Pengendara-Motor-yang-Baik-di-Jalan-Raya-3.jpg")
+cap = cv2.VideoCapture(helm)
+
 cap.set(cv2.CAP_PROP_BUFFERSIZE, 3)
 
 # Tentukan ukuran frame output yang diinginkan
@@ -46,15 +48,19 @@ async def kirim_gambar(cropped_image,nama_file):
     pytesseract.pytesseract.tesseract_cmd = r'C:/Program Files/Tesseract-OCR/tesseract.exe'
     ri = cv2.resize(cropped_image,(c_w,c_h),interpolation=cv2.INTER_AREA)
     img_gray = cv2.cvtColor(ri,cv2.COLOR_BGR2GRAY)
-    th,threshold = cv2.threshold(img_gray,150,255,cv2.THRESH_BINARY_INV)
-    # cv2.imshow(nama_file,threshold)
+    th,threshold = cv2.threshold(img_gray,100,255,cv2.THRESH_BINARY_INV)
+    cv2.imshow(nama_file,threshold)
+    # cv2.imshow(cropped_image)
     result = pytesseract.image_to_string((threshold))
 
     result = ''.join([char for char in result if char.isalnum()])
     count = 3
     for attempt in range(count):
         try:
-            await bot.send_photo(chat_id=CHAT_ID, photo=bio, caption=result)
+            # print("isi plat"+result+"isi plat")
+            if(result!=''):
+                print("isi plat"+result+"isi plat")
+                # await bot.send_photo(chat_id=CHAT_ID, photo=bio, caption=result)
             break
         except TimedOut:
             if attempt<count-1:
@@ -102,8 +108,9 @@ async def main():
                     cropped_images.append(cropped_image)
 
                     # Mengirim gambar hasil crop ke Telegram
-                    print(label1)
-                    await kirim_gambar(cropped_image,label1)
+                    # print(label1)
+                    if(label1=="Pengendara"):
+                        await kirim_gambar(cropped_image,label1)
 
             # Ubah ukuran frame
             resized_frame = cv2.resize(frame, (output_width, output_height))
