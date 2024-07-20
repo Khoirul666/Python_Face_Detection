@@ -8,19 +8,22 @@ import pytesseract
 from PIL import Image
 
 # Token bot Telegram
-TELEGRAM_BOT_TOKEN = 'xx'
-CHAT_ID = 'xx'
+TELEGRAM_BOT_TOKEN = '6946770589:AAFpzUX3dgYKF6MMjHuaT6VAvlmXpv859CM'
+CHAT_ID = '1185669068'
 
 # Inisialisasi bot Telegram
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
 
 # Path video file atau URL stream
-no_helm = 'D:\\KHOI\\PYTHON\\dataset\\HELM and NO\\PICTURE\\NO HELM\\no_helm 002.jpg'
-helm = 'D:\\KHOI\\PYTHON\\dataset\\HELM and NO\\PICTURE\\HELM\\helm 001.jpg'
+no_helm = r'D:\KHOI\PYTHON\dataset\HELM and NO\PICTURE\NO HELM\no_helm 002.jpg'
+helm = r'D:\KHOI\PYTHON\dataset\HELM and NO\PICTURE\HELM\helm 001.jpg'
+vid_1 = r'D:\KHOI\PYTHON\Source\pengendara motor\video\Suasana Jalan Jatingaleh, Semarang saat jam kerja.mp4'
+vid_2 = r'D:\KHOI\PYTHON\Source\pengendara motor\video\VID20240311151058.mp4'
+vid_3 = r'D:\KHOI\PYTHON\Source\pengendara motor\video\VID20240316141158.mp4'
 
 # Membuka video atau gambar
 # cap = cv2.VideoCapture("https://s3.ap-southeast-1.amazonaws.com/moladin.assets/blog/wp-content/uploads/2019/08/15175153/15-Cara-Menjadi-Pengendara-Motor-yang-Baik-di-Jalan-Raya-3.jpg")
-cap = cv2.VideoCapture(helm)
+cap = cv2.VideoCapture(r'D:\KHOI\PYTHON\WhatsApp Image 2024-07-20 at 19.40.40_1f67b106.jpg')
 
 cap.set(cv2.CAP_PROP_BUFFERSIZE, 3)
 
@@ -29,9 +32,10 @@ output_width = 1280
 output_height = 760
 
 # Model YOLO
-model = YOLO(r"D:\KHOI\PYTHON\dataset\Detection Helm and Number.v5i.yolov8\best.pt")
+model = YOLO(r"D:\KHOI\PYTHON\runs\detect\train2\weights\best.pt")
 
 async def kirim_gambar(cropped_image,nama_file):
+    # crop plat nomor
     # while True:
     #     with open(cropped_image,'rb') as image:
     #         await bot.send_photo(chat_id=CHAT_ID, photo=image)
@@ -48,7 +52,7 @@ async def kirim_gambar(cropped_image,nama_file):
     pytesseract.pytesseract.tesseract_cmd = r'C:/Program Files/Tesseract-OCR/tesseract.exe'
     ri = cv2.resize(cropped_image,(c_w,c_h),interpolation=cv2.INTER_AREA)
     img_gray = cv2.cvtColor(ri,cv2.COLOR_BGR2GRAY)
-    th,threshold = cv2.threshold(img_gray,100,255,cv2.THRESH_BINARY_INV)
+    th,threshold = cv2.threshold(img_gray,127,255,cv2.THRESH_BINARY_INV)
     cv2.imshow(nama_file,threshold)
     # cv2.imshow(cropped_image)
     result = pytesseract.image_to_string((threshold))
@@ -57,7 +61,7 @@ async def kirim_gambar(cropped_image,nama_file):
     count = 3
     for attempt in range(count):
         try:
-            # print("isi plat"+result+"isi plat")
+            print("isi plat"+result+"isi plat")
             if(result!=''):
                 print("isi plat"+result+"isi plat")
                 # await bot.send_photo(chat_id=CHAT_ID, photo=bio, caption=result)
@@ -109,7 +113,8 @@ async def main():
 
                     # Mengirim gambar hasil crop ke Telegram
                     # print(label1)
-                    if(label1=="Pengendara"):
+                    if(label1=="pengendara"):
+                        print('pengendara')
                         await kirim_gambar(cropped_image,label1)
 
             # Ubah ukuran frame
