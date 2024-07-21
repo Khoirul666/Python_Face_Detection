@@ -7,8 +7,8 @@ import asyncio
 import pytesseract
 
 # Token bot Telegram
-TELEGRAM_BOT_TOKEN = '7492865767:AAH2SH4MRBnGazf9zJ5wTS6sXbnodCRXbZA'
-CHAT_ID = '2135671506'
+TELEGRAM_BOT_TOKEN = 'xx'
+CHAT_ID = 'xx'
 
 # Inisialisasi bot Telegram
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
